@@ -1,12 +1,13 @@
 import type { TestEmailConnectionInput } from "@/features/email/email.schema";
 import { getSystemConfig } from "@/features/config/config.data";
 import { createEmailClient } from "@/features/email/email.utils";
+import { err, ok } from "@/lib/error";
 import { isNotInProduction, serverEnv } from "@/lib/env/server.env";
 
 export async function testEmailConnection(
   context: DbContext,
   data: TestEmailConnectionInput,
-): Promise<{ success: boolean; error?: string }> {
+) {
   try {
     const { ADMIN_EMAIL } = serverEnv(context.env);
     const { apiKey, senderAddress, senderName } = data;
@@ -20,13 +21,13 @@ export async function testEmailConnection(
     });
 
     if (result.error) {
-      return { success: false, error: result.error.message };
+      return err({ reason: "SEND_FAILED", message: result.error.message });
     }
 
-    return { success: true };
+    return ok({ success: true });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "未知错误";
-    return { success: false, error: errorMessage };
+    return err({ reason: "SEND_FAILED", message: errorMessage });
   }
 }
 
