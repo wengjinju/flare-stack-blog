@@ -9,6 +9,12 @@ import { getAuth } from "@/lib/auth/auth.server";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { serverEnv } from "@/lib/env/server.env";
 
+/* ======================= Type Guards ====================== */
+
+export function hasSession(context: SessionContext): context is AuthContext {
+  return context.session !== null;
+}
+
 /* ======================= Infrastructure ====================== */
 
 export const dbMiddleware = createMiddleware({ type: "function" }).server(

@@ -82,7 +82,13 @@ export function myCommentsQuery(
 ) {
   return queryOptions({
     queryKey: [...COMMENTS_KEYS.mine, options],
-    queryFn: () => getMyCommentsFn({ data: options }),
+    queryFn: async () => {
+      const result = await getMyCommentsFn({ data: options });
+      if (result.error) {
+        return [];
+      }
+      return result.data;
+    },
   });
 }
 

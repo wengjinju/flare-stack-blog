@@ -16,6 +16,8 @@ export function useComments(postId?: number) {
       if (result.error) {
         const reason = result.error.reason;
         switch (reason) {
+          case "UNAUTHENTICATED":
+            throw new Error("请先登录后再评论");
           case "ROOT_COMMENT_NOT_FOUND":
           case "REPLY_TO_COMMENT_NOT_FOUND":
             throw new Error("该评论已被删除，请刷新页面");
@@ -66,6 +68,8 @@ export function useComments(postId?: number) {
       if (result.error) {
         const reason = result.error.reason;
         switch (reason) {
+          case "UNAUTHENTICATED":
+            throw new Error("请先登录后再操作");
           case "COMMENT_NOT_FOUND":
             throw new Error("评论不存在或已删除");
           case "PERMISSION_DENIED":

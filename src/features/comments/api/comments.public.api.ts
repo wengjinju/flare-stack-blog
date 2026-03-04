@@ -1,9 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import {
-  getRequestHeaders,
-  setResponseHeader,
-} from "@tanstack/react-start/server";
-import {
   CreateCommentInputSchema,
   DeleteCommentInputSchema,
   GetCommentsByPostIdInputSchema,
@@ -11,38 +7,25 @@ import {
   GetRepliesByRootIdInputSchema,
 } from "@/features/comments/comments.schema";
 import * as CommentService from "@/features/comments/comments.service";
+import { err, ok } from "@/lib/error";
 import {
-  authMiddleware,
   createRateLimitMiddleware,
+  hasSession,
   sessionMiddleware,
   turnstileMiddleware,
 } from "@/lib/middlewares";
-import { CACHE_CONTROL } from "@/lib/constants";
 
 // Public API - Get root comments by post ID (published + viewer's pending)
 export const getRootCommentsByPostIdFn = createServerFn()
   .middleware([sessionMiddleware])
   .inputValidator(GetCommentsByPostIdInputSchema)
   .handler(async ({ data, context }) => {
-    const session = await context.auth.api.getSession({
-      headers: getRequestHeaders(),
-    });
+    const session = context.session;
 
     const result = await CommentService.getRootCommentsByPostId(context, {
       ...data,
       viewerId: session?.user.id,
     });
-
-    // Handle caching based on session
-    if (!session) {
-      Object.entries(CACHE_CONTROL.swr).forEach(([k, v]) => {
-        setResponseHeader(k, v);
-      });
-    } else {
-      Object.entries(CACHE_CONTROL.private).forEach(([k, v]) => {
-        setResponseHeader(k, v);
-      });
-    }
 
     return result;
   });
@@ -52,25 +35,12 @@ export const getRepliesByRootIdFn = createServerFn()
   .middleware([sessionMiddleware])
   .inputValidator(GetRepliesByRootIdInputSchema)
   .handler(async ({ data, context }) => {
-    const session = await context.auth.api.getSession({
-      headers: getRequestHeaders(),
-    });
+    const session = context.session;
 
     const result = await CommentService.getRepliesByRootId(context, {
       ...data,
       viewerId: session?.user.id,
     });
-
-    // Handle caching based on session
-    if (!session) {
-      Object.entries(CACHE_CONTROL.swr).forEach(([k, v]) => {
-        setResponseHeader(k, v);
-      });
-    } else {
-      Object.entries(CACHE_CONTROL.private).forEach(([k, v]) => {
-        setResponseHeader(k, v);
-      });
-    }
 
     return result;
   });
@@ -86,10 +56,14 @@ export const createCommentFn = createServerFn({
       key: "comments:create",
     }),
     turnstileMiddleware,
-    authMiddleware,
+    sessionMiddleware,
   ])
   .inputValidator(CreateCommentInputSchema)
   .handler(async ({ data, context }) => {
+    if (!hasSession(context)) {
+      return err({ reason: "UNAUTHENTICATED" });
+    }
+
     return await CommentService.createComment(context, data);
   });
 
@@ -102,16 +76,24 @@ export const deleteCommentFn = createServerFn({
       interval: "1m",
       key: "comments:delete",
     }),
-    authMiddleware,
+    sessionMiddleware,
   ])
   .inputValidator(DeleteCommentInputSchema)
   .handler(async ({ data, context }) => {
+    if (!hasSession(context)) {
+      return err({ reason: "UNAUTHENTICATED" });
+    }
+
     return await CommentService.deleteComment(context, data);
   });
 
 export const getMyCommentsFn = createServerFn()
-  .middleware([authMiddleware])
+  .middleware([sessionMiddleware])
   .inputValidator(GetMyCommentsInputSchema)
   .handler(async ({ data, context }) => {
-    return await CommentService.getMyComments(context, data);
+    if (!hasSession(context)) {
+      return err({ reason: "UNAUTHENTICATED" });
+    }
+
+    return ok(await CommentService.getMyComments(context, data));
   });

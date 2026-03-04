@@ -3,7 +3,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { EMAIL_UNSUBSCRIBE_TYPES } from "@/lib/db/schema";
 import {
   adminMiddleware,
-  authMiddleware,
   dbMiddleware,
   sessionMiddleware,
 } from "@/lib/middlewares";
@@ -69,9 +68,13 @@ export const getReplyNotificationStatusFn = createServerFn({
 export const toggleReplyNotificationFn = createServerFn({
   method: "POST",
 })
-  .middleware([authMiddleware])
+  .middleware([sessionMiddleware])
   .inputValidator(z.object({ enabled: z.boolean() }))
   .handler(async ({ context, data }) => {
+    if (!context.session) {
+      return err({ reason: "UNAUTHENTICATED" });
+    }
+
     if (data.enabled) {
       await EmailData.subscribe(
         context.db,

@@ -2,11 +2,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { SubmitFriendLinkInputSchema } from "../friend-links.schema";
 import * as FriendLinkService from "../friend-links.service";
 import {
-  authMiddleware,
   createRateLimitMiddleware,
   dbMiddleware,
+  hasSession,
+  sessionMiddleware,
   turnstileMiddleware,
 } from "@/lib/middlewares";
+import { err, ok } from "@/lib/error";
 
 export const submitFriendLinkFn = createServerFn({
   method: "POST",
@@ -18,10 +20,14 @@ export const submitFriendLinkFn = createServerFn({
       key: "friend-links:submit",
     }),
     turnstileMiddleware,
-    authMiddleware,
+    sessionMiddleware,
   ])
   .inputValidator(SubmitFriendLinkInputSchema)
   .handler(async ({ data, context }) => {
+    if (!hasSession(context)) {
+      return err({ reason: "UNAUTHENTICATED" });
+    }
+
     return await FriendLinkService.submitFriendLink(context, data);
   });
 
@@ -32,7 +38,11 @@ export const getApprovedFriendLinksFn = createServerFn()
   });
 
 export const getMyFriendLinksFn = createServerFn()
-  .middleware([authMiddleware])
+  .middleware([sessionMiddleware])
   .handler(async ({ context }) => {
-    return await FriendLinkService.getMyFriendLinks(context);
+    if (!hasSession(context)) {
+      return err({ reason: "UNAUTHENTICATED" });
+    }
+
+    return ok(await FriendLinkService.getMyFriendLinks(context));
   });

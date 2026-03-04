@@ -26,7 +26,11 @@ export function useNotificationToggle(userId: string | undefined) {
   const mutation = useMutation({
     mutationFn: (enabled: boolean) =>
       toggleReplyNotificationFn({ data: { enabled } }),
-    onSuccess: (_, enabled) => {
+    onSuccess: (result, enabled) => {
+      if (result.error) {
+        toast.error("请先登录后再操作");
+        return;
+      }
       queryClient.setQueryData(EMAIL_KEYS.replyNotification(userId), {
         data: { enabled },
         error: null,

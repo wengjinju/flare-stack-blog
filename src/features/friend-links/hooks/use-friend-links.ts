@@ -17,9 +17,17 @@ export function useFriendLinks() {
     mutationFn: async (input: Parameters<typeof submitFriendLinkFn>[0]) => {
       const result = await submitFriendLinkFn(input);
       if (result.error) {
-        throw new Error(
-          { DUPLICATE_URL: "该站点URL已提交过申请" }[result.error.reason],
-        );
+        const reason = result.error.reason;
+        switch (reason) {
+          case "UNAUTHENTICATED":
+            throw new Error("请先登录后再提交");
+          case "DUPLICATE_URL":
+            throw new Error("该站点URL已提交过申请");
+          default: {
+            reason satisfies never;
+            throw new Error("未知错误");
+          }
+        }
       }
       return result.data;
     },

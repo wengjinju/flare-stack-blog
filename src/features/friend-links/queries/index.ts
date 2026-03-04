@@ -16,7 +16,13 @@ export const FRIEND_LINKS_KEYS = {
 export function myFriendLinksQuery() {
   return queryOptions({
     queryKey: FRIEND_LINKS_KEYS.mine,
-    queryFn: () => getMyFriendLinksFn(),
+    queryFn: async () => {
+      const result = await getMyFriendLinksFn();
+      if (result.error) {
+        return [];
+      }
+      return result.data;
+    },
   });
 }
 

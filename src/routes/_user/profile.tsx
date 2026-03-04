@@ -36,7 +36,13 @@ function ProfilePage() {
   const passwordForm = usePasswordForm();
   const { data: hasPassword } = useQuery({
     queryKey: AUTH_KEYS.hasPassword(user?.id),
-    queryFn: () => userHasPasswordFn(),
+    queryFn: async () => {
+      const result = await userHasPasswordFn();
+      if (result.error) {
+        throw new Error("登录状态已失效，请重新登录");
+      }
+      return result.data;
+    },
     enabled: !!user,
   });
   const notification = useNotificationToggle(user?.id);
