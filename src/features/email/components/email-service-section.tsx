@@ -2,7 +2,7 @@ import { Eye, EyeOff, Globe, Info, Loader2, Lock, Wifi } from "lucide-react";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { SystemConfig } from "@/features/config/config.schema";
-import type { Result } from "@/lib/error";
+import type { Result } from "@/lib/errors";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 

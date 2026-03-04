@@ -6,7 +6,7 @@ import {
   ModerateCommentInputSchema,
 } from "@/features/comments/comments.schema";
 import * as CommentService from "@/features/comments/comments.service";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 import { hasSession, sessionMiddleware } from "@/lib/middlewares";
 
 // Admin API - Get all comments with filters

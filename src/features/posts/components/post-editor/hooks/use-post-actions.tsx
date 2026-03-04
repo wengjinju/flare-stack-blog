@@ -24,6 +24,21 @@ interface UsePostActionsOptions {
   allTags: Array<Tag>;
 }
 
+function getErrorReason(result: unknown): string | null {
+  if (!result || typeof result !== "object" || !("error" in result)) {
+    return null;
+  }
+  const error = (result as { error?: { reason?: string } | null }).error;
+  return error?.reason ?? null;
+}
+
+function unwrapResultData<T>(result: unknown): T {
+  if (result && typeof result === "object" && "data" in result) {
+    return (result as { data: T }).data;
+  }
+  return result as T;
+}
+
 export function usePostActions({
   postId,
   post,
@@ -112,22 +127,21 @@ export function usePostActions({
 
   const processDataMutation = useMutation({
     mutationFn: startPostProcessWorkflowFn,
-  });
-
-  const handleProcessData = () => {
-    if (processState !== "IDLE") return;
-
-    setProcessState("PROCESSING");
-
-    setTimeout(() => {
-      processDataMutation.mutate({
-        data: {
-          id: postId,
-          status: post.status,
-          clientToday: toLocalDateString(new Date()),
-        },
-      });
-
+    onSuccess: (result) => {
+      const reason = getErrorReason(result);
+      if (reason) {
+        switch (reason) {
+          case "UNAUTHENTICATED":
+            toast.error("登录状态已失效，请重新登录");
+            return;
+          case "PERMISSION_DENIED":
+            toast.error("权限不足，仅管理员可发布");
+            return;
+          default:
+            toast.error("发布流启动失败");
+            return;
+        }
+      }
       // Feedback: Notify user task is running
       toast("发布流启动", {
         description: "后台正在进行内容处理与部署分析。",
@@ -147,6 +161,26 @@ export function usePostActions({
       setTimeout(() => {
         setProcessState("IDLE");
       }, 3000);
+    },
+    onError: (error) => {
+      toast.error("发布流启动失败", { description: error.message });
+      setProcessState("IDLE");
+    },
+  });
+
+  const handleProcessData = () => {
+    if (processState !== "IDLE") return;
+
+    setProcessState("PROCESSING");
+
+    setTimeout(() => {
+      processDataMutation.mutate({
+        data: {
+          id: postId,
+          status: post.status,
+          clientToday: toLocalDateString(new Date()),
+        },
+      });
     }, 800);
   };
 
@@ -160,10 +194,25 @@ export function usePostActions({
         },
       }),
     onSuccess: (result) => {
-      setPost((prev) => ({ ...prev, slug: result.slug }));
+      const reason = getErrorReason(result);
+      if (reason) {
+        switch (reason) {
+          case "UNAUTHENTICATED":
+            setError("登录状态已失效，请重新登录");
+            return;
+          case "PERMISSION_DENIED":
+            setError("权限不足，仅管理员可生成 slug");
+            return;
+          default:
+            setError("Slug生成失败");
+            return;
+        }
+      }
+      const payload = unwrapResultData<{ slug: string }>(result);
+      setPost((prev) => ({ ...prev, slug: payload.slug }));
       if (slugGenerationMode.current === "manual") {
         toast.success("URL slug 已设置", {
-          description: `URL slug 已设置为 "${result.slug}"`,
+          description: `URL slug 已设置为 "${payload.slug}"`,
         });
       }
     },
@@ -183,7 +232,22 @@ export function usePostActions({
         },
       }),
     onSuccess: (result) => {
-      setPost((prev) => ({ ...prev, summary: result.summary }));
+      const reason = getErrorReason(result);
+      if (reason) {
+        switch (reason) {
+          case "UNAUTHENTICATED":
+            toast.error("登录状态已失效，请重新登录");
+            return;
+          case "PERMISSION_DENIED":
+            toast.error("权限不足，仅管理员可生成摘要");
+            return;
+          default:
+            toast.error("摘要生成失败");
+            return;
+        }
+      }
+      const payload = unwrapResultData<{ summary: string }>(result);
+      setPost((prev) => ({ ...prev, summary: payload.summary }));
     },
     onError: (error) => {
       toast.error("摘要生成失败", {

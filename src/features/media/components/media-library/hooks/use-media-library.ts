@@ -90,7 +90,19 @@ export function useMediaLibrary() {
       for (const key of keys) {
         const result = await deleteImageFn({ data: { key } });
         if (result.error) {
-          throw new Error("资源正在被文章使用，无法删除");
+          const reason = result.error.reason;
+          switch (reason) {
+            case "MEDIA_IN_USE":
+              throw new Error("资源正在被文章使用，无法删除");
+            case "UNAUTHENTICATED":
+              throw new Error("登录状态已失效，请重新登录");
+            case "PERMISSION_DENIED":
+              throw new Error("权限不足，仅管理员可删除资源");
+            default: {
+              reason satisfies never;
+              throw new Error("删除资源失败");
+            }
+          }
         }
       }
       return keys; // 返回 keys 以便在 onSuccess 中使用
@@ -119,7 +131,23 @@ export function useMediaLibrary() {
 
   // Update name mutation
   const updateAsset = useMutation({
-    mutationFn: updateMediaNameFn,
+    mutationFn: async (payload: Parameters<typeof updateMediaNameFn>[0]) => {
+      const result = await updateMediaNameFn(payload);
+      if (result.error) {
+        const reason = result.error.reason;
+        switch (reason) {
+          case "UNAUTHENTICATED":
+            throw new Error("登录状态已失效，请重新登录");
+          case "PERMISSION_DENIED":
+            throw new Error("权限不足，仅管理员可更新资源信息");
+          default: {
+            reason satisfies never;
+            throw new Error("更新资源元数据失败");
+          }
+        }
+      }
+      return result.data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MEDIA_KEYS.all });
       toast.success("资源元数据已更新", {

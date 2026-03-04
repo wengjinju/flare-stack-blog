@@ -14,7 +14,7 @@ import { AdminNotificationEmail } from "@/features/email/templates/AdminNotifica
 import { convertToPlainText } from "@/features/posts/utils/content";
 import { sendReplyNotification } from "@/features/comments/workflows/helpers";
 import { serverEnv } from "@/lib/env/server.env";
-import { err, ok } from "@/lib/error";
+import { err, ok } from "@/lib/errors";
 
 // ============ Public Service Methods ============
 

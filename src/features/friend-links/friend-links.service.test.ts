@@ -8,7 +8,7 @@ import {
   waitForBackgroundTasks,
 } from "tests/test-utils";
 import * as FriendLinkService from "./friend-links.service";
-import { unwrap } from "@/lib/error";
+import { unwrap } from "@/lib/errors";
 
 describe("FriendLinkService", () => {
   let adminContext: ReturnType<typeof createAdminTestContext>;

@@ -28,7 +28,7 @@ import {
   highlightCodeBlocks,
   slugify,
 } from "@/features/posts/utils/content";
-import { err, ok } from "@/lib/error";
+import { err, ok } from "@/lib/errors";
 import { purgePostCDNCache } from "@/lib/invalidate";
 import * as SearchService from "@/features/search/search.service";
 import { calculatePostHash } from "@/features/posts/utils/sync";

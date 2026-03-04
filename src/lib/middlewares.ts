@@ -8,6 +8,12 @@ import { getDb } from "@/lib/db";
 import { getAuth } from "@/lib/auth/auth.server";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 import { serverEnv } from "@/lib/env/server.env";
+import {
+  createAuthError,
+  createPermissionError,
+  createRateLimitError,
+  createTurnstileError,
+} from "@/lib/errors";
 
 /* ======================= Type Guards ====================== */
 
@@ -79,7 +85,7 @@ export const authMiddleware = createMiddleware({ type: "function" })
     const session = context.session;
 
     if (!session) {
-      throw new Error("UNAUTHENTICATED");
+      throw createAuthError();
     }
 
     return next({
@@ -95,7 +101,7 @@ export const adminMiddleware = createMiddleware({ type: "function" })
     const session = context.session;
 
     if (session.user.role !== "admin") {
-      throw new Error("PERMISSION_DENIED");
+      throw createPermissionError();
     }
 
     return next({
@@ -125,9 +131,7 @@ export const createRateLimitMiddleware = (
       const result = await rateLimiter.checkLimit(options);
 
       if (!result.allowed) {
-        throw new Error(
-          `请求过于频繁，请 ${Math.ceil(result.retryAfterMs / 1000)} 秒后重试`,
-        );
+        throw createRateLimitError(result.retryAfterMs);
       }
 
       return next();
@@ -152,13 +156,13 @@ export const turnstileMiddleware = createMiddleware({ type: "function" })
 
     const token = getRequestHeader("X-Turnstile-Token");
     if (!token) {
-      throw new Error("Missing Turnstile token");
+      throw createTurnstileError("缺少人机验证凭证");
     }
 
     const result = await verifyTurnstileToken({ secretKey, token });
 
     if (!result.success) {
-      throw new Error("人机验证失败，请刷新页面重试");
+      throw createTurnstileError();
     }
 
     return next();

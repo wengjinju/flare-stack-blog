@@ -8,7 +8,7 @@ import {
   sessionMiddleware,
   turnstileMiddleware,
 } from "@/lib/middlewares";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 
 export const submitFriendLinkFn = createServerFn({
   method: "POST",

@@ -9,7 +9,7 @@ import * as TagService from "@/features/tags/tags.service";
 import * as PostService from "@/features/posts/posts.service";
 import { TAGS_CACHE_KEYS } from "@/features/tags/tags.schema";
 import * as CacheService from "@/features/cache/cache.service";
-import { unwrap } from "@/lib/error";
+import { unwrap } from "@/lib/errors";
 
 describe("TagService", () => {
   let ctx: ReturnType<typeof createAdminTestContext>;

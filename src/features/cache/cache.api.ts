@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import * as CacheService from "@/features/cache/cache.service";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 import { hasSession, sessionMiddleware } from "@/lib/middlewares";
 
 export const invalidateSiteCacheFn = createServerFn()

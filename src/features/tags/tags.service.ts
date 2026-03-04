@@ -18,7 +18,7 @@ import { POSTS_CACHE_KEYS } from "@/features/posts/posts.schema";
 import * as TagRepo from "@/features/tags/data/tags.data";
 import * as CacheService from "@/features/cache/cache.service";
 import { purgeCDNCache } from "@/lib/invalidate";
-import { err, ok } from "@/lib/error";
+import { err, ok } from "@/lib/errors";
 
 /**
  * Get all tags (cached)

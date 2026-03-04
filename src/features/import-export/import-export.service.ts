@@ -2,7 +2,7 @@ import type {
   StartExportInput,
   TaskProgress,
 } from "@/features/import-export/import-export.schema";
-import type { Result } from "@/lib/error";
+import type { Result } from "@/lib/errors";
 import {
   ExportManifestSchema,
   IMPORT_EXPORT_CACHE_KEYS,
@@ -10,7 +10,7 @@ import {
   TaskProgressSchema,
 } from "@/features/import-export/import-export.schema";
 import * as CacheService from "@/features/cache/cache.service";
-import { err, ok } from "@/lib/error";
+import { err, ok } from "@/lib/errors";
 
 export async function startExport(
   context: BaseContext,

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import * as AuthService from "@/features/auth/auth.service";
 import { dbMiddleware, hasSession, sessionMiddleware } from "@/lib/middlewares";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 
 export const getSessionFn = createServerFn()
   .middleware([sessionMiddleware])

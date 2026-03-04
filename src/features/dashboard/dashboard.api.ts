@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 import { hasSession, sessionMiddleware } from "@/lib/middlewares";
 import * as DashboardService from "@/features/dashboard/dashboard.service";
 import * as CacheService from "@/features/cache/cache.service";

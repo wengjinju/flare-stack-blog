@@ -13,7 +13,7 @@ import * as DashboardRepo from "@/features/dashboard/data/dashboard.data";
 import * as MediaRepo from "@/features/media/data/media.data";
 import * as CacheService from "@/features/cache/cache.service";
 import { serverEnv } from "@/lib/env/server.env";
-import { ok } from "@/lib/error";
+import { ok } from "@/lib/errors";
 
 // Schema for single range data
 const MetricSchema = z.object({

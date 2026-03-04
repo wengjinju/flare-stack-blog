@@ -8,7 +8,7 @@ import {
   UpdateFriendLinkInputSchema,
 } from "../friend-links.schema";
 import * as FriendLinkService from "../friend-links.service";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 import { hasSession, sessionMiddleware } from "@/lib/middlewares";
 
 export const getAllFriendLinksFn = createServerFn()

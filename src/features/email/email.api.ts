@@ -4,7 +4,7 @@ import { EMAIL_UNSUBSCRIBE_TYPES } from "@/lib/db/schema";
 import { dbMiddleware, hasSession, sessionMiddleware } from "@/lib/middlewares";
 import * as EmailService from "@/features/email/email.service";
 import { TestEmailConnectionSchema } from "@/features/email/email.schema";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 
 export const testEmailConnectionFn = createServerFn({
   method: "POST",

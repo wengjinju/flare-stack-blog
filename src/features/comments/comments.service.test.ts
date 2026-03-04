@@ -8,7 +8,7 @@ import {
 } from "tests/test-utils";
 import * as CommentService from "@/features/comments/comments.service";
 import * as PostService from "@/features/posts/posts.service";
-import { unwrap } from "@/lib/error";
+import { unwrap } from "@/lib/errors";
 
 describe("CommentService", () => {
   let adminContext: ReturnType<typeof createAdminTestContext>;

@@ -4,7 +4,7 @@ import {
   UpsertSearchDocSchema,
 } from "@/features/search/search.schema";
 import * as SearchService from "@/features/search/search.service";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 import { dbMiddleware, hasSession, sessionMiddleware } from "@/lib/middlewares";
 
 export const buildSearchIndexFn = createServerFn()

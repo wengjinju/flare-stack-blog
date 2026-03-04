@@ -10,7 +10,7 @@ import {
   getContentTypeFromKey,
 } from "@/features/media/media.utils";
 import { CACHE_CONTROL } from "@/lib/constants";
-import { err, ok } from "@/lib/error";
+import { err, ok } from "@/lib/errors";
 
 export async function upload(
   context: DbContext & { executionCtx: ExecutionContext },
@@ -89,7 +89,7 @@ export async function getMediaList(
   context: DbContext,
   data: GetMediaListInput,
 ) {
-  return await MediaRepo.getMediaList(context.db, data);
+  return ok(await MediaRepo.getMediaList(context.db, data));
 }
 
 export async function isMediaInUse(context: DbContext, key: string) {
@@ -97,25 +97,25 @@ export async function isMediaInUse(context: DbContext, key: string) {
 }
 
 export async function getLinkedPosts(context: DbContext, key: string) {
-  return await PostMediaRepo.getPostsByMediaKey(context.db, key);
+  return ok(await PostMediaRepo.getPostsByMediaKey(context.db, key));
 }
 
 export async function getLinkedMediaKeys(
   context: DbContext,
   keys: Array<string>,
 ) {
-  return await PostMediaRepo.getLinkedMediaKeys(context.db, keys);
+  return ok(await PostMediaRepo.getLinkedMediaKeys(context.db, keys));
 }
 
 export async function getTotalMediaSize(context: DbContext) {
-  return await MediaRepo.getTotalMediaSize(context.db);
+  return ok(await MediaRepo.getTotalMediaSize(context.db));
 }
 
 export async function updateMediaName(
   context: DbContext,
   data: UpdateMediaNameInput,
 ) {
-  return await MediaRepo.updateMediaName(context.db, data.key, data.name);
+  return ok(await MediaRepo.updateMediaName(context.db, data.key, data.name));
 }
 
 export async function handleImageRequest(

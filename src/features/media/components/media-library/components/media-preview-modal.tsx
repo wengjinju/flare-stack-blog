@@ -120,7 +120,21 @@ export function MediaPreviewModal({
     queryKey: MEDIA_KEYS.linkedPosts(activeAsset?.key || ""),
     queryFn: async () => {
       if (!activeAsset?.key) return [];
-      return getLinkedPostsFn({ data: { key: activeAsset.key } });
+      const result = await getLinkedPostsFn({ data: { key: activeAsset.key } });
+      if (result.error) {
+        const reason = result.error.reason;
+        switch (reason) {
+          case "UNAUTHENTICATED":
+            throw new Error("登录状态已失效，请重新登录");
+          case "PERMISSION_DENIED":
+            throw new Error("权限不足，仅管理员可查看引用关系");
+          default: {
+            reason satisfies never;
+            throw new Error("获取资源引用关系失败");
+          }
+        }
+      }
+      return result.data;
     },
     enabled: !!activeAsset?.key,
   });

@@ -7,7 +7,7 @@ import {
   GetRepliesByRootIdInputSchema,
 } from "@/features/comments/comments.schema";
 import * as CommentService from "@/features/comments/comments.service";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 import {
   createRateLimitMiddleware,
   hasSession,

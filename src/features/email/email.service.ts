@@ -6,7 +6,7 @@ import {
   createEmailClient,
   verifyUnsubscribeToken,
 } from "@/features/email/email.utils";
-import { err, ok } from "@/lib/error";
+import { err, ok } from "@/lib/errors";
 import { isNotInProduction, serverEnv } from "@/lib/env/server.env";
 
 export async function testEmailConnection(

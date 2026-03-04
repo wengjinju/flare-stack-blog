@@ -17,7 +17,7 @@ import * as CacheService from "@/features/cache/cache.service";
 import { FriendLinkAdminNotificationEmail } from "@/features/email/templates/FriendLinkAdminNotificationEmail";
 import { FriendLinkResultNotificationEmail } from "@/features/email/templates/FriendLinkResultNotificationEmail";
 import { serverEnv } from "@/lib/env/server.env";
-import { err, ok } from "@/lib/error";
+import { err, ok } from "@/lib/errors";
 import { purgeCDNCache } from "@/lib/invalidate";
 
 // ============ Authed User Methods ============

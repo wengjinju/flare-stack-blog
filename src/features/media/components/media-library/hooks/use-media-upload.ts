@@ -30,7 +30,19 @@ export function useMediaUpload() {
       formData.append("image", file);
       const result = await uploadImageFn({ data: formData });
       if (result.error) {
-        throw new Error("媒体入库失败，请重试");
+        const reason = result.error.reason;
+        switch (reason) {
+          case "MEDIA_RECORD_CREATE_FAILED":
+            throw new Error("媒体入库失败，请重试");
+          case "UNAUTHENTICATED":
+            throw new Error("登录状态已失效，请重新登录");
+          case "PERMISSION_DENIED":
+            throw new Error("权限不足，仅管理员可上传媒体");
+          default: {
+            reason satisfies never;
+            throw new Error("上传失败");
+          }
+        }
       }
       return result.data;
     },

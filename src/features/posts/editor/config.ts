@@ -57,7 +57,19 @@ async function handleImageUpload(file: File): Promise<ImageUploadResult> {
 
   const result = await uploadImageFn({ data: formData });
   if (result.error) {
-    throw new Error("图片入库失败，请重试");
+    const reason = result.error.reason;
+    switch (reason) {
+      case "MEDIA_RECORD_CREATE_FAILED":
+        throw new Error("图片入库失败，请重试");
+      case "UNAUTHENTICATED":
+        throw new Error("登录状态已失效，请重新登录");
+      case "PERMISSION_DENIED":
+        throw new Error("权限不足，仅管理员可上传图片");
+      default: {
+        reason satisfies never;
+        throw new Error("图片上传失败");
+      }
+    }
   }
   toast.success("图片上传成功", {
     description: `${file.name} 已归档保存`,

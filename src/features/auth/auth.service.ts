@@ -2,7 +2,7 @@ import { z } from "zod";
 import * as AuthRepo from "@/features/auth/auth.data";
 import * as ConfigRepo from "@/features/config/config.data";
 import * as CacheService from "@/features/cache/cache.service";
-import { ok } from "@/lib/error";
+import { ok } from "@/lib/errors";
 
 export async function getSession(context: SessionContext) {
   return context.session;

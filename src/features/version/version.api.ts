@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import * as VersionService from "./version.service";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 import { hasSession, sessionMiddleware } from "@/lib/middlewares";
 
 export const checkUpdateFn = createServerFn()

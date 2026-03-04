@@ -102,7 +102,28 @@ export function postBySlugQuery(slug: string) {
 export function postByIdQuery(id: number) {
   return queryOptions({
     queryKey: POSTS_KEYS.detail(id),
-    queryFn: () => findPostByIdFn({ data: { id } }),
+    queryFn: async () => {
+      const result = await findPostByIdFn({ data: { id } });
+      if (
+        result &&
+        typeof result === "object" &&
+        "error" in result &&
+        result.error
+      ) {
+        const reason = result.error.reason;
+        switch (reason) {
+          case "UNAUTHENTICATED":
+            throw new Error("登录状态已失效，请重新登录");
+          case "PERMISSION_DENIED":
+            throw new Error("权限不足，仅管理员可访问");
+          default:
+            throw new Error("获取文章失败");
+        }
+      }
+      return result && typeof result === "object" && "data" in result
+        ? result.data
+        : result;
+    },
   });
 }
 

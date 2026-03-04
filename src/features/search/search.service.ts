@@ -14,7 +14,7 @@ import { convertToPlainText } from "@/features/posts/utils/content";
 import { createMyDb } from "@/features/search/model/schema";
 import { PostsTable } from "@/lib/db/schema";
 import { buildSnippet, getMatchedTerms } from "@/features/search/search.utils";
-import { ok } from "@/lib/error";
+import { ok } from "@/lib/errors";
 
 export const CONTENT_SLICE = 10000;
 export const SNIPPET_SLICE = 200;

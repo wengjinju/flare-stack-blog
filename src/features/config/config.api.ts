@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import * as ConfigService from "@/features/config/config.service";
-import { err } from "@/lib/error";
+import { err } from "@/lib/errors";
 import { hasSession, sessionMiddleware } from "@/lib/middlewares";
 import { SystemConfigSchema } from "@/features/config/config.schema";
 

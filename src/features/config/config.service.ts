@@ -1,7 +1,7 @@
 import type { SystemConfig } from "@/features/config/config.schema";
 import * as CacheService from "@/features/cache/cache.service";
 import * as ConfigRepo from "@/features/config/config.data";
-import { ok } from "@/lib/error";
+import { ok } from "@/lib/errors";
 import {
   CONFIG_CACHE_KEYS,
   SystemConfigSchema,

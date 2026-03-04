@@ -92,12 +92,27 @@ export function PostManager({
   const createMutation = useMutation({
     mutationFn: () => createEmptyPostFn(),
     onSuccess: (result) => {
+      if ("error" in result && result.error) {
+        const reason = result.error.reason;
+        switch (reason) {
+          case "UNAUTHENTICATED":
+            toast.error("登录状态已失效，请重新登录");
+            return;
+          case "PERMISSION_DENIED":
+            toast.error("权限不足，仅管理员可创建文章");
+            return;
+          default:
+            toast.error("新建条目失败");
+            return;
+        }
+      }
+      const createdPost = "data" in result ? result.data : result;
       // Precise invalidation for new post creation
       queryClient.invalidateQueries({ queryKey: POSTS_KEYS.adminLists });
       queryClient.invalidateQueries({ queryKey: POSTS_KEYS.counts });
       navigate({
         to: "/admin/posts/edit/$id",
-        params: { id: String(result.id) },
+        params: { id: String(createdPost.id) },
       });
     },
     onError: (e) => {

@@ -9,7 +9,7 @@ import {
 import * as PostService from "@/features/posts/posts.service";
 import * as TagService from "@/features/tags/tags.service";
 import * as CacheService from "@/features/cache/cache.service";
-import { unwrap } from "@/lib/error";
+import { unwrap } from "@/lib/errors";
 
 describe("PostService", () => {
   let adminContext: ReturnType<typeof createAdminTestContext>;
