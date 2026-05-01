@@ -34,6 +34,23 @@ const config = defineConfig(({ mode }) => {
         ),
       },
     },
+
+    // ==============================================
+    // 我加的修复代码 → 解决 cloudflare:workers 报错
+    // ==============================================
+    build: {
+      rollupOptions: {
+        external: ["cloudflare:workers", "cloudflare:sockets"],
+      },
+    },
+    ssr: {
+      external: ["cloudflare:workers", "cloudflare:sockets"],
+    },
+    optimizeDeps: {
+      exclude: ["cloudflare:workers", "cloudflare:sockets"],
+    },
+    // ==============================================
+
     plugins: [
       paraglideVitePlugin({
         project: "./project.inlang",
