@@ -95,9 +95,12 @@ jobs:
 
       - name: Deploy to Cloudflare Workers
         run: |
-          bunx wrangler secret bulk secrets.json
+          bunx wrangler secret bulk secrets.json --env=""
           bun run build
-          bun run deploy
+          bun run deploy --env=""
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Purge Cloudflare CDN Cache
         run: |
