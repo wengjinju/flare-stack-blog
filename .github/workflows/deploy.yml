@@ -28,86 +28,14 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
-
       - name: Install dependencies
-        run: bun ci
+        run: bun install
 
-      - name: Inject Resource IDs
-        run: |
-          ROUTE="${{ vars.ROUTE }}"
-          ZONE_NAME="${{ vars.ZONE_NAME }}"
-          ROUTE="${ROUTE:-$ROUTE}"
-          ZONE_NAME="${ZONE_NAME:-$ZONE_NAME}"
-          export ROUTE
-          export ZONE_NAME
-          bun run wrangler:prepare
-        env:
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-          D1_DATABASE_ID: ${{ secrets.D1_DATABASE_ID }}
-          KV_NAMESPACE_ID: ${{ secrets.KV_NAMESPACE_ID }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          DL_DATABASE_ID: ${{ secrets.DL_DATABASE_ID }}
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
-          BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
-          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
-          CLOUDFLARE_PURGE_API_TOKEN: ${{ secrets.CLOUDFLARE_PURGE_API_TOKEN }}
-          DOMAIN: ${{ secrets.DOMAIN }}
-          CON_DOMAIN: ${{ secrets.CON_DOMAIN }}
-          UNAMI_SRC: ${{ secrets.UNAMI_SRC }}
-          VITE_UNAMI_WEBSITE_ID: ${{ vars.VITE_UNAMI_WEBSITE_ID }}
-          PAGEVIEW_SALT: ${{ secrets.PAGEVIEW_SALT }}
-          VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
-          THEME: ${{ vars.THEME }}
-          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
-
-      - name: Generate Secrets JSON
-        run: |
-          cat <<EOF > secrets.json
-          {
-            "BETTER_AUTH_SECRET": "${{ secrets.BETTER_AUTH_SECRET }}",
-            "BETTER_AUTH_URL": "${{ secrets.BETTER_AUTH_URL }}",
-            "ADMIN_EMAIL": "${{ secrets.ADMIN_EMAIL }}",
-            "GITHUB_CLIENT_ID": "${{ secrets.GITHUB_CLIENT_ID }}",
-            "GITHUB_CLIENT_SECRET": "${{ secrets.GITHUB_CLIENT_SECRET }}",
-            "CLOUDFLARE_ZONE_ID": "${{ secrets.CLOUDFLARE_ZONE_ID }}",
-            "CLOUDFLARE_PURGE_API_TOKEN": "${{ secrets.CLOUDFLARE_PURGE_API_TOKEN }}",
-            "DOMAIN": "${{ secrets.DOMAIN }}",
-            "CON_DOMAIN": "${{ secrets.CON_DOMAIN }}",
-            "VITE_UNAMI_WEBSITE_ID": "${{ vars.VITE_UNAMI_WEBSITE_ID }}",
-            "UNAMI_SRC": "${{ secrets.UNAMI_SRC }}",
-            "PAGEVIEW_SALT": "${{ secrets.PAGEVIEW_SALT }}",
-            "TURNSTILE_SECRET_KEY": "${{ secrets.TURNSTILE_SECRET_KEY }}",
-            "GITHUB_TOKEN": "${{ secrets.GITHUB_TOKEN }}"
-          }
-          EOF
+      - name: Build
+        run: bun run build
 
       - name: Deploy to Cloudflare Workers
-        run: |
-          bunx wrangler secret bulk secrets.json --env=""
-          bun run build
-          bun run deploy --env=""
+        run: bun run deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Purge Cloudflare CDN Cache
-        run: |
-          PURGE_DOMAIN="${CON_DOMAIN:-$DOMAIN}"
-          echo "Purging CDN cache for $PURGE_DOMAIN"
-          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
-            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_PURGE_API_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            --data '{"prefixes":["'$PURGE_DOMAIN'"]}'
-          echo ""
