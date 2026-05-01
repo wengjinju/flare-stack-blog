@@ -34,8 +34,7 @@
     "auth:generate-schema": "bunx @better-auth/cli generate --config auth-cli.ts --output src/lib/db/schema/auth.table.ts",
     "mcp:inspect": "bunx -y @modelcontextprotocol/inspector",
     "create-theme": "bun scripts/create-theme.ts",
-    "release": "export GITHUB_TOKEN=${gh auth token} && release-it",
-    "prepare": "husky"
+    "release": "export GITHUB_TOKEN=${gh auth token} && release-it"
   },
   "dependencies": {
     // 依赖部分保持不变，不用修改
